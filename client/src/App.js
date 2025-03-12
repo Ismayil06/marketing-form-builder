@@ -1,15 +1,21 @@
-
+import React from 'react';
+import { FormProvider } from './context/FormContext';
+import { DragHandler } from './components/builder/DragHandler';
+import Toolbox from './components/builder/Toolbox';
+import Canvas from './components/builder/Canvas';
 import './App.css';
-import FormBuilder from './components/builder/FormBuilder';
 
-function App() {
+const App = () => {
   return (
-    <div className="App">
-      <header className="App-header">
-        <FormBuilder/>
-      </header>
-    </div>
+    <FormProvider>
+      <DragHandler>
+        <div className="app-container">
+          <Toolbox />
+          <Canvas />
+        </div>
+      </DragHandler>
+    </FormProvider>
   );
-}
+};
 
 export default App;
