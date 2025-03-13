@@ -33,7 +33,7 @@ const Field = ({ field, isBuilder = true }) => {
   const renderField = () => {
     const commonProps = {
       ...field,
-      readOnly: !isBuilder,
+      readOnly: isBuilder,
       onChange: (value) => isBuilder ? null : updateField(field.id, { answer: value })
     };
 

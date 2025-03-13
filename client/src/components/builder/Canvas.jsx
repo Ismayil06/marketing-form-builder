@@ -22,10 +22,12 @@ import TableEditor from '../fields/TableEditor.jsx';
 import Field from './Field';
 import { arrayMove } from '@dnd-kit/sortable';
 import './canvas.css';
+import { ModeContext } from '../../context/ModeContext.jsx';
 
 
 const Canvas = () => {
   const { formFields, addField, moveFields } = useContext(FormContext);
+  const { isPreviewMode } = useContext(ModeContext);
   const { setNodeRef } = useDroppable({ id: 'canvas' });
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -40,7 +42,7 @@ const Canvas = () => {
         <SortableContext items={formFields} strategy={verticalListSortingStrategy}>
             {formFields.map((field) => {if (formFields.length > 0) {
                 return (
-                    <Field key={field.id} field={field} isBuilder={true} />
+                    <Field key={field.id} field={field} isBuilder={!isPreviewMode} />
                 );
               
             }})}
