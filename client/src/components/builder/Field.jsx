@@ -1,7 +1,7 @@
-import React, { useState, useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { useFormContext } from '../../context/FormContext';
+import { FormContext } from '../../context/FormContext';
 import TextInput from '../fields/TextInput';
 import Dropdown from '../fields/Dropdown';
 import TableEditor from '../fields/TableEditor';
@@ -9,7 +9,7 @@ import FieldSettings from './FieldSettings';
 import './field.css';
 
 const Field = ({ field, isBuilder = true }) => {
-  const { updateField } = useFormContext();
+  const { updateField } = useContext(FormContext);
   const [showSettings, setShowSettings] = useState(false);
   
   const {
@@ -18,14 +18,11 @@ const Field = ({ field, isBuilder = true }) => {
     setNodeRef,
     transform,
     transition,
-    isDragging,
   } = useSortable({ id: field.id, disabled: !isBuilder });
 
   const style = {
-    transform: CSS.Translate.toString(transform),
+    transform: CSS.Transform.toString(transform),
     transition,
-    opacity: isDragging ? 0.5 : 1,
-    zIndex: isDragging ? 1000 : 'auto',
   };
 
   const handleSettingsChange = (newSettings) => {
@@ -57,15 +54,13 @@ const Field = ({ field, isBuilder = true }) => {
       ref={setNodeRef}
       style={style}
       className={`field-container ${isBuilder ? 'builder-mode' : 'preview-mode'}`}
-      {...attributes}
-      {...listeners}
     >
       {isBuilder && (
         <div className="field-header">
           <button 
             className="drag-handle"
+            {...attributes}
             {...listeners}
-            aria-label="Drag handle"
           >
             ⠿
           </button>
@@ -73,7 +68,6 @@ const Field = ({ field, isBuilder = true }) => {
           <button
             className="settings-button"
             onClick={() => setShowSettings(true)}
-            aria-label="Field settings"
           >
             ⚙️
           </button>

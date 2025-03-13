@@ -1,19 +1,31 @@
 import React from 'react';
 import { useContext } from 'react';
-import { DndContext } from '@dnd-kit/core';
+import { DndContext , DragOverlay} from '@dnd-kit/core';
 import { FormContext } from '../../context/FormContext';
+import { useState } from 'react';
+import { ToolboxItem } from './Toolbox';
+import './Toolbox.css';
+const formElements = [
+  { type: 'text', label: 'Text Input', icon: 'T' },
+  { type: 'dropdown', label: 'Dropdown', icon: '▼' },
+  { type: 'table', label: 'Table', icon: '◫' },
+  { type: 'file', label: 'File Upload', icon: '📁' }, // Bonus
+];
 
 export const DragHandler = ({ children }) => {
   const {formFields, moveField, addField } = useContext(FormContext);
-
+  const [activeType, setActiveType] = useState(null);
   const handleDragEnd = (event) => {
+    
     const { active, over } = event;
-    if (active.id !== over?.id) {
+    if (formFields.length > 0 && active.id !== over?.id) {
         const oldIndex = formFields.findIndex(f => f.id === active.id);
         const newIndex = formFields.findIndex(f => f.id === over?.id);
         moveField(oldIndex, newIndex);
     }
+    
     if (active.data.current?.isToolboxItem && over?.id === 'canvas') {
+
       const newField = {
         id: `field-${Date.now()}`,
         type: active.data.current.type,
@@ -34,10 +46,28 @@ export const DragHandler = ({ children }) => {
       addField(newField);
     }
   };
-
+  function handleDragStart(event) {
+    console.log(event.active.data.current.type);
+    setActiveType(event.active.data.current.type);
+  }
   return (
-    <DndContext onDragEnd={handleDragEnd}>
-      {children}
-    </DndContext>
+    <>
+      <DndContext onDragEnd={handleDragEnd} onDragStart={handleDragStart}>
+          {children}
+      </DndContext>
+      <DragOverlay>
+        {activeType ? (
+          formElements.map((element) => {
+            if (element.type === activeType) {
+
+              return <ToolboxItem key={element.type} element={element} />;
+            }
+            return null;
+          }
+          )
+        ): null}
+      </DragOverlay>
+    </>
+    
   );
 };

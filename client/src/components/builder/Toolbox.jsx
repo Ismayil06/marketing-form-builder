@@ -13,7 +13,7 @@ const formElements = [
 export const ToolboxItem = ({ element }) => {
   const { attributes, listeners, setNodeRef, transform, transition } = useDraggable({
     id: `toolbox-${element.type}`,
-    data: { type: element.type }
+    data: { isToolboxItem: true, type: element.type }
   });
 
   const style = {
