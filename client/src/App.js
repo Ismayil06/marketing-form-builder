@@ -1,25 +1,42 @@
-import React from 'react';
-import { FormProvider } from './context/FormContext';
-import { ModeProvider } from './context/ModeContext';
-import { DragHandler } from './components/builder/DragHandler';
-import Toolbox from './components/builder/Toolbox';
-import Canvas from './components/builder/Canvas';
+import React, { useContext } from 'react';
+import { DragOverlayWrapper } from './components/DragOverlayWrapper';
+
 import './App.css';
-import Header from './components/builder/Header';
+import { useState } from 'react';
+import { DndContext, MouseSensor, TouchSensor, useSensor, useSensors } from "@dnd-kit/core";
+import Designer from './components/Designer';
+import DesignerContextProvider from './components/context/DesignerContext';
+import PreviewDialogBtn from './components/PreviewDialogBtn';
 const App = () => {
+
+  const [isReady, setIsReady] = useState(false);
+
+  const mouseSensor = useSensor(MouseSensor, {
+    activationConstraint: {
+      distance: 10, // 10px
+    },
+  });
+
+  const touchSensor = useSensor(TouchSensor, {
+    activationConstraint: {
+      delay: 300,
+      tolerance: 5,
+    },
+  });
+
+  const sensors = useSensors(mouseSensor, touchSensor);
+
+
   return (
-    <FormProvider>
-      <ModeProvider>
-        <Header/>
-        <DragHandler>
-          <div className="app-container">
-            <Toolbox />
-            <Canvas />
-          </div>
-        </DragHandler>
-      </ModeProvider>
+    <DndContext sensors={sensors}>
+      <DesignerContextProvider>
+        <PreviewDialogBtn></PreviewDialogBtn>
+        <Designer/>
+      <DragOverlayWrapper/>
+      </DesignerContextProvider>
       
-    </FormProvider>
+    </DndContext>
+    
   );
 };
 

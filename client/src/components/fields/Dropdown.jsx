@@ -1,127 +1,218 @@
-import React, { useState, useEffect } from 'react';
-import './Dropdown.css';
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useEffect, useState } from "react";
+import { z } from "zod";
+import useDesigner from "../hooks/useDesigner";
+import "./Dropdown.css";
 
-const Dropdown = ({
-  options = [],
-  value = '',
-  onChange,
-  readOnly,
-  question,
-  required
-}) => {
-  const [localOptions, setLocalOptions] = useState(options);
-  const [error, setError] = useState('');
-  const [isTouched, setIsTouched] = useState(false);
+// filepath: /Users/ismayil/Desktop/VS Code/marketing-form-builder/client/src/components/fields/Dropdown.jsx
 
-  // Handle builder mode option updates
-  const handleOptionChange = (index, newValue) => {
-    const updatedOptions = [...localOptions];
-    updatedOptions[index] = newValue;
-    setLocalOptions(updatedOptions);
-    onChange(updatedOptions);
-  };
 
-  // Handle preview mode selection
-  const handleSelectChange = (e) => {
-    const selectedValue = e.target.value;
-    onChange(selectedValue);
-    if (required) validate(selectedValue);
-  };
 
-  const addOption = () => {
-    const newOptions = [...localOptions, `Option ${localOptions.length + 1}`];
-    setLocalOptions(newOptions);
-    onChange(newOptions);
-  };
+const extraAttributes = {
+  label: "Dropdown",
+  helperText: "Helper text",
+  required: false,
+  // Comma separated options string (will be split into an array)
+  options: "Option 1,Option 2,Option 3",
+};
 
-  const removeOption = (index) => {
-    const newOptions = localOptions.filter((_, i) => i !== index);
-    setLocalOptions(newOptions);
-    onChange(newOptions);
-  };
+const propertiesSchema = z.object({
+  label: z.string().min(2).max(50),
+  helperText: z.string().max(200),
+  required: z.boolean().default(false),
+  options: z.string(),
+});
 
-  const validate = (val) => {
-    if (required && !val) {
-      setError('This field is required');
-      return false;
+export const DropdownFormElement = {
+  type: "Dropdown",
+  construct: (id) => ({
+    id,
+    type: "Dropdown",
+    extraAttributes,
+  }),
+  designerBtnElement: {
+    icon: null,
+    label: "Dropdown",
+  },
+  designerComponent: DesignerComponent,
+  formComponent: FormComponent,
+  propertiesComponent: PropertiesComponent,
+  validate: (formElement, currentValue) => {
+    if (formElement.extraAttributes.required) {
+      return currentValue !== "";
     }
-    setError('');
     return true;
-  };
+  },
+};
 
-  const handleBlur = () => {
-    if (!readOnly) {
-      setIsTouched(true);
-      validate(value);
-    }
-  };
-
-  useEffect(() => {
-    if (isTouched) validate(value);
-  }, [value, isTouched]);
-
-  // Builder Mode
-  if (readOnly) {
-    return (
-      <div className="dropdown-builder">
-        <div className="builder-header">
-          <h4 className="dropdown-question">{question}</h4>
-          <span className="required-hint">{required && '*'}</span>
-        </div>
-        
-        <div className="options-list">
-          {localOptions.map((option, index) => (
-            <div key={index} className="option-item">
-              <input
-                type="text"
-                value={option}
-                onChange={(e) => handleOptionChange(index, e.target.value)}
-                placeholder={`Option ${index + 1}`}
-              />
-              <button
-                type="button"
-                className="remove-option"
-                onClick={() => removeOption(index)}
-                disabled={localOptions.length === 1}
-              >
-                &times;
-              </button>
-            </div>
-          ))}
-        </div>
-        
-        <button type="button" className="add-option" onClick={addOption}>
-          + Add Option
-        </button>
-      </div>
-    );
-  }
-
-  // Preview Mode
+function DesignerComponent({ elementInstance }) {
+  const element = elementInstance;
+  const { label, required, helperText, options } = element.extraAttributes;
+  const optionList = options.split(",").map(opt => opt.trim());
+  
   return (
-    <div className="dropdown-preview">
-      <label className="dropdown-label">
-        {question}
-        {required && <span className="required-star"> *</span>}
+    <div className="designer-component">
+      <label>
+        {label}
+        {required && "*"}
       </label>
-      
-      <select
-        value={value}
-        onChange={handleSelectChange}
-        onBlur={handleBlur}
-        className={`dropdown-select ${error ? 'error' : ''}`}
-      >
-        <option value="">Select an option</option>
-        {localOptions.map((option, index) => (
-          <option key={index} value={option}>
+      <select disabled>
+        {optionList.map((option, idx) => (
+          <option key={idx} value={option}>
             {option}
           </option>
         ))}
       </select>
-
-      {error && <div className="error-message">{error}</div>}
+      {helperText && <p className="helper-text">{helperText}</p>}
     </div>
   );
-};
+}
 
-export default Dropdown;
+function FormComponent({ elementInstance, submitValue, isInvalid, defaultValue }) {
+  const element = elementInstance;
+  const { label, required, helperText, options } = element.extraAttributes;
+  const optionList = options.split(",").map(opt => opt.trim());
+  
+  const [value, setValue] = useState(defaultValue || "");
+  const [error, setError] = useState(false);
+  
+  useEffect(() => {
+    setError(!!isInvalid);
+  }, [isInvalid]);
+  
+  return (
+    <div className="form-component">
+      <label className={error ? "error-label" : ""}>
+        {label}
+        {required && "*"}
+      </label>
+      <select
+        className={error ? "error-select" : ""}
+        value={value}
+        onChange={(e) => setValue(e.target.value)}
+        onBlur={(e) => {
+          if (!submitValue) return;
+          const valid = DropdownFormElement.validate(element, e.target.value);
+          setError(!valid);
+          if (valid) submitValue(element.id, e.target.value);
+        }}
+      >
+        <option value="">Select an option</option>
+        {optionList.map((option, idx) => (
+          <option key={idx} value={option}>
+            {option}
+          </option>
+        ))}
+      </select>
+      {helperText && <p className={error ? "error-helper" : "helper-text"}>{helperText}</p>}
+    </div>
+  );
+}
+
+function PropertiesComponent({ elementInstance }) {
+  const element = elementInstance;
+  const { label, helperText, options } = element.extraAttributes;
+  const { updateElement } = useDesigner();
+  const { register, handleSubmit, reset, getValues } = useForm({
+    resolver: zodResolver(propertiesSchema),
+    defaultValues: { ...element.extraAttributes, options },
+  });
+
+  // Initialize localOptions state from the options string
+  const initialOptions = options.split(",").map(opt => opt.trim());
+  const [localOptions, setLocalOptions] = useState(initialOptions);
+
+  useEffect(() => {
+    reset({ ...element.extraAttributes, options });
+    setLocalOptions(initialOptions);
+  }, [element, reset, options]);
+
+  const applyChanges = (data) => {
+    // Merge localOptions into the options string field
+    updateElement(element.id, {
+      ...element,
+      extraAttributes: {
+        ...data,
+        options: localOptions.join(","),
+      },
+    });
+  };
+
+  const addOption = () => {
+    setLocalOptions([...localOptions, "New Option"]);
+  };
+
+  const removeOption = (index) => {
+    if (localOptions.length === 1) return;
+    setLocalOptions(localOptions.filter((_, idx) => idx !== index));
+  };
+
+  return (
+    <form className="properties-form" onSubmit={handleSubmit(applyChanges)}>
+      <div className="form-field">
+        <label>Label: </label>
+        <input
+          type="text"
+          {...register("label")}
+          onKeyDown={(e) => e.key === "Enter" && e.target.blur()}
+        />
+      </div>
+
+      <div className="options-list">
+        {localOptions.map((option, index) => (
+          <div key={index} className="option-item">
+            <input
+              type="text"
+              value={option}
+              onChange={(e) => {
+                const newOptions = [...localOptions];
+                newOptions[index] = e.target.value;
+                setLocalOptions(newOptions);
+              }}
+              placeholder={`Option ${index + 1}`}
+              onBlur={handleSubmit(applyChanges)}
+            />
+            <button
+              type="button"
+              className="remove-option"
+              onClick={() => removeOption(index)}
+              disabled={localOptions.length === 1}
+            >
+              &times;
+            </button>
+          </div>
+        ))}
+        <button type="button" onClick={addOption}>
+          Add Option
+        </button>
+      </div>
+
+      <div className="form-field">
+        <label>Helper Text: </label>
+        <input
+          type="text"
+          {...register("helperText")}
+          onKeyDown={(e) => e.key === "Enter" && e.target.blur()}
+        />
+      </div>
+
+      <div className="switch-field">
+        <label>
+          Required Field: 
+        </label>
+        <input
+          type="checkbox"
+          {...register("required")}
+          onChange={(e) =>
+            handleSubmit(applyChanges)({
+              ...getValues(),
+              required: e.target.checked,
+            })
+          }
+        />
+      </div>
+      <input type="submit" value="Submit" />
+    </form>
+  );
+}

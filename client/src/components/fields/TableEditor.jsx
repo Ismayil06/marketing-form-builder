@@ -1,184 +1,399 @@
-import React, { useState, useEffect } from 'react';
-import Dropdown from './Dropdown';
-import './TableEditor.css';
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useEffect, useState } from "react";
+import useDesigner from "../hooks/useDesigner";
+import { z } from "zod";
+import "./TableEditor.css";
 
-const TableEditor = ({
-  columns = [],
-  data = [],
-  onChange,
-  readOnly,
-  question,
-  required
-}) => {
-  const [localData, setLocalData] = useState(data);
-  const [errors, setErrors] = useState({});
 
-  // Handle builder mode column configuration
-  const handleColumnChange = (index, key, value) => {
-    const newColumns = [...columns];
-    newColumns[index] = { ...newColumns[index], [key]: value };
-    onChange({ columns: newColumns });
-  };
 
-  // Handle preview mode data input
-  const handleDataChange = (rowIndex, columnIndex, value) => {
-    const newData = [...localData];
-    if (!newData[rowIndex]) newData[rowIndex] = {};
-    newData[rowIndex][columnIndex] = value;
-    setLocalData(newData);
-    onChange({ data: newData });
-    validateCell(rowIndex, columnIndex, value);
-  };
 
-  const addRow = () => {
-    const newData = [...localData, {}];
-    setLocalData(newData);
-    onChange({ data: newData });
-  };
-
-  const validateCell = (rowIndex, columnIndex, value) => {
-    const column = columns[columnIndex];
-    const newErrors = { ...errors };
-    
-    if (column?.required && !value?.trim()) {
-      newErrors[`${rowIndex}-${columnIndex}`] = 'This field is required';
-    } else if (column?.type === 'text' && column?.minLength && value?.length < column.minLength) {
-      newErrors[`${rowIndex}-${columnIndex}`] = `Minimum ${column.minLength} characters`;
-    } else {
-      delete newErrors[`${rowIndex}-${columnIndex}`];
-    }
-
-    setErrors(newErrors);
-  };
-
-  // Builder mode UI
-  if (readOnly) {
-    return (
-      <div className="table-builder">
-        <div className="builder-header">
-          <h4 className="table-question">{question}</h4>
-          <button 
-            type="button" 
-            className="add-column-button"
-            onClick={() => onChange({ columns: [...columns, { name: '', type: 'text' }] })}
-          >
-            + Add Column
-          </button>
-        </div>
-
-        <div className="columns-config">
-          {columns.map((column, index) => (
-            <div key={index} className="column-config">
-              <input
-                type="text"
-                placeholder="Column name"
-                value={column.name}
-                onChange={(e) => handleColumnChange(index, 'name', e.target.value)}
-                className="column-name-input"
-              />
-              <select
-                value={column.type}
-                onChange={(e) => handleColumnChange(index, 'type', e.target.value)}
-                className="column-type-select"
-              >
-                <option value="text">Text</option>
-                <option value="dropdown">Dropdown</option>
-              </select>
-
-              {column.type === 'dropdown' && (
-                <div className="dropdown-options">
-                  {column.options?.map((option, optIndex) => (
-                    <div key={optIndex} className="option-input">
-                      <input
-                        type="text"
-                        value={option}
-                        onChange={(e) => {
-                          const newOptions = [...column.options];
-                          newOptions[optIndex] = e.target.value;
-                          handleColumnChange(index, 'options', newOptions);
-                        }}
-                      />
-                      <button
-                        type="button"
-                        className="remove-option"
-                        onClick={() => {
-                          const newOptions = column.options.filter((_, i) => i !== optIndex);
-                          handleColumnChange(index, 'options', newOptions);
-                        }}
-                      >
-                        &minus;
-                      </button>
-                    </div>
-                  ))}
-                  <button
-                    type="button"
-                    className="add-option"
-                    onClick={() => {
-                      const newOptions = [...(column.options || []), `Option ${(column.options?.length || 0) + 1}`];
-                      handleColumnChange(index, 'options', newOptions);
-                    }}
-                  >
-                    + Add Option
-                  </button>
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-  }
-
-  // Preview mode UI
-  return (
-    <div className="table-preview">
-      <div className="table-header">
-        <h4 className="table-question">{question}{required && <span className="required-star"> *</span>}</h4>
-      </div>
-
-      <div className="table-container">
-        <div className="table-row header">
-          {columns.map((col, index) => (
-            <div key={index} className="table-cell">
-              {col.name}
-              {col.required && <span className="required-star"> *</span>}
-            </div>
-          ))}
-        </div>
-
-        {localData.map((row, rowIndex) => (
-          <div key={rowIndex} className="table-row">
-            {columns.map((col, colIndex) => (
-              <div key={colIndex} className="table-cell">
-                {col.type === 'dropdown' ? (
-                  <Dropdown
-                    options={col.options || []}
-                    value={row[colIndex] || ''}
-                    onChange={(value) => handleDataChange(rowIndex, colIndex, value)}
-                  />
-                ) : (
-                  <input
-                    type="text"
-                    value={row[colIndex] || ''}
-                    onChange={(e) => handleDataChange(rowIndex, colIndex, e.target.value)}
-                    placeholder={`Enter ${col.name}`}
-                    maxLength={col.maxLength}
-                  />
-                )}
-                {errors[`${rowIndex}-${colIndex}`] && (
-                  <div className="cell-error">{errors[`${rowIndex}-${colIndex}`]}</div>
-                )}
-              </div>
-            ))}
-          </div>
-        ))}
-
-        <button type="button" className="add-row-button" onClick={addRow}>
-          + Add Row
-        </button>
-      </div>
-    </div>
-  );
+const extraAttributes = {
+  label: "Table Field",
+  helperText: "Helper text",
+  required: false,
+  rows: 3,
+  columns: 3,
+  cellType: "text", // new: "text" or "dropdown"
+  choices: "", // comma separated options when cellType is dropdown
 };
 
-export default TableEditor;
+const propertiesSchema = z.object({
+  label: z.string().min(2).max(50),
+  helperText: z.string().max(200),
+  required: z.boolean().default(false),
+  rows: z.number().min(1).max(10),
+  columns: z.number().min(1).max(10),
+  cellType: z.enum(["text", "dropdown"]).default("text"),
+  choices: z.string().optional(),
+});
+
+export const TableFormElement = {
+  type: "Table",
+  construct: (id) => ({
+    id,
+    type: "Table",
+    extraAttributes,
+  }),
+  designerBtnElement: {
+    icon: null,
+    label: "Table",
+  },
+  designerComponent: DesignerComponent,
+  formComponent: FormComponent,
+  propertiesComponent: PropertiesComponent,
+  validate: (formElement, currentValue) => {
+    const { required } = formElement.extraAttributes;
+    if (!required) return true;
+    if (!Array.isArray(currentValue)) return false;
+    for (const row of currentValue) {
+      for (const cell of row) {
+        if (cell.trim() === "") {
+          return false;
+        }
+      }
+    }
+    return true;
+  },
+};
+
+function DesignerComponent({ elementInstance }) {
+  const { label, helperText, required, rows, columns } = elementInstance.extraAttributes;
+  // A simple preview table with static cell content
+  const tablePreview = Array.from({ length: rows }).map((_, rowIndex) => (
+    <tr key={rowIndex}>
+      {Array.from({ length: columns }).map((_, colIndex) => (
+        <td key={colIndex}>Cell</td>
+      ))}
+    </tr>
+  ));
+
+  return (
+    <div className="designer-component">
+      <label>
+        {label}
+        {required && "*"}
+      </label>
+      <table className="designer-table">
+        <tbody>{tablePreview}</tbody>
+      </table>
+      {helperText && <p className="helper-text">{helperText}</p>}
+    </div>
+  );
+}
+
+function FormComponent({ elementInstance, submitValue, isInvalid, defaultValue }) {
+  const { label, helperText, required, rows, columns, cellType, choices } = elementInstance.extraAttributes;
+  const [tableData, setTableData] = useState(
+    defaultValue ||
+      Array.from({ length: rows }, () => Array.from({ length: columns }, () => ""))
+  );
+  const [error, setError] = useState(false);
+
+  useEffect(() => {
+    setError(!!isInvalid);
+  }, [isInvalid]);
+
+  const handleCellChange = (rowIndex, colIndex, value) => {
+    setTableData((prev) => {
+      const newData = prev.map((row) => [...row]);
+      newData[rowIndex][colIndex] = value;
+      return newData;
+    });
+  };
+
+  const validateTable = (data) => {
+    if (!required) return true;
+    for (const row of data) {
+      for (const cell of row) {
+        if (cell.trim() === "") return false;
+      }
+    }
+    return true;
+  };
+
+  const handleBlur = () => {
+    if (!submitValue) return;
+    const valid = validateTable(tableData);
+    setError(!valid);
+    if (valid) {
+      submitValue(elementInstance.id, tableData);
+    }
+  };
+
+  // For dropdown cells, derive options from the choices string
+  const dropdownOptions = cellType === "dropdown" && choices
+    ? choices.split(",").map(opt => opt.trim()).filter(opt => opt !== "")
+    : [];
+
+  return (
+    <div className="form-component">
+      <label className={error ? "error-label" : ""}>
+        {label}
+        {required && "*"}
+      </label>
+      <table className="form-table">
+        <tbody>
+          {tableData.map((row, rowIndex) => (
+            <tr key={rowIndex}>
+              {row.map((cell, colIndex) => (
+                <td key={colIndex}>
+                  {cellType === "dropdown" ? (
+                    <select
+                      className={error ? "error-input" : ""}
+                      value={cell}
+                      onChange={(e) => handleCellChange(rowIndex, colIndex, e.target.value)}
+                      onBlur={handleBlur}
+                    >
+                      <option value="">Select...</option>
+                      {dropdownOptions.map((option, idx) => (
+                        <option key={idx} value={option}>{option}</option>
+                      ))}
+                    </select>
+                  ) : (
+                    <input
+                      type="text"
+                      className={error ? "error-input" : ""}
+                      value={cell}
+                      onChange={(e) => handleCellChange(rowIndex, colIndex, e.target.value)}
+                      onBlur={handleBlur}
+                    />
+                  )}
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      {helperText && <p className={error ? "error-helper" : "helper-text"}>{helperText}</p>}
+    </div>
+  );
+}
+
+function PropertiesComponent({ elementInstance }) {
+  const { updateElement } = useDesigner();
+  const { register, handleSubmit, reset, watch, getValues } = useForm({
+    resolver: zodResolver(propertiesSchema),
+    defaultValues: elementInstance.extraAttributes,
+  });
+
+  // Initialize localChoices state from the choices string (for dropdown cellType)
+  const initialChoices = (elementInstance.extraAttributes.choices || "")
+    .split(",")
+    .map((opt) => opt.trim())
+    .filter((opt) => opt !== "");
+  const [localChoices, setLocalChoices] = useState(
+    initialChoices.length ? initialChoices : ["New Option"]
+  );
+
+  // Initialize cellTypeMatrix: If elementInstance.extraAttributes.cellTypes exists, use it.
+  // Otherwise, fill with the global "cellType" value.
+  const { rows, columns, cellType } = elementInstance.extraAttributes;
+  const [cellTypeMatrix, setCellTypeMatrix] = useState(() => {
+    if (elementInstance.extraAttributes.cellTypes) {
+      return elementInstance.extraAttributes.cellTypes;
+    }
+    return Array.from({ length: rows }, () =>
+      Array.from({ length: columns }, () => cellType)
+    );
+  });
+
+  useEffect(() => {
+    reset(elementInstance.extraAttributes);
+    const updatedChoices = (elementInstance.extraAttributes.choices || "")
+      .split(",")
+      .map((opt) => opt.trim())
+      .filter((opt) => opt !== "");
+    setLocalChoices(updatedChoices.length ? updatedChoices : ["New Option"]);
+    // Reset cellTypeMatrix when elementInstance changes.
+    const updatedRows = elementInstance.extraAttributes.rows;
+    const updatedColumns = elementInstance.extraAttributes.columns;
+    setCellTypeMatrix(
+      elementInstance.extraAttributes.cellTypes ||
+        Array.from({ length: updatedRows }, () =>
+          Array.from({ length: updatedColumns }, () => elementInstance.extraAttributes.cellType)
+        )
+    );
+  }, [elementInstance, reset]);
+
+  // Watch for changes to rows/columns to update cellTypeMatrix dimensions.
+  const watchRows = watch("rows");
+  const watchColumns = watch("columns");
+  useEffect(() => {
+    setCellTypeMatrix((prevMatrix) => {
+      const newMatrix = [];
+      for (let i = 0; i < watchRows; i++) {
+        newMatrix[i] = [];
+        for (let j = 0; j < watchColumns; j++) {
+          newMatrix[i][j] =
+            prevMatrix[i] && prevMatrix[i][j] ? prevMatrix[i][j] : getValues("cellType");
+        }
+      }
+      return newMatrix;
+    });
+  }, [watchRows, watchColumns, getValues]);
+
+  const toggleCellType = (rowIndex, colIndex) => {
+    setCellTypeMatrix((prevMatrix) => {
+      const newMatrix = prevMatrix.map((row) => [...row]);
+      newMatrix[rowIndex][colIndex] =
+        newMatrix[rowIndex][colIndex] === "text" ? "dropdown" : "text";
+      return newMatrix;
+    });
+  };
+
+  const applyChanges = (data) => {
+    updateElement(elementInstance.id, {
+      ...elementInstance,
+      extraAttributes: {
+        ...data,
+        choices: localChoices.join(","),
+        cellTypes: cellTypeMatrix,
+      },
+    });
+  };
+
+  const watchCellType = watch("cellType");
+
+  const addChoice = () => {
+    setLocalChoices([...localChoices, "New Option"]);
+  };
+
+  const removeChoice = (index) => {
+    if (localChoices.length === 1) return;
+    setLocalChoices(localChoices.filter((_, idx) => idx !== index));
+  };
+
+  return (
+    <form className="properties-form" onSubmit={handleSubmit(applyChanges)}>
+      <div className="form-field">
+        <label>Label</label>
+        <input
+          type="text"
+          {...register("label")}
+          onKeyDown={(e) => e.key === "Enter" && e.target.blur()}
+        />
+        <span className="form-description">The label displayed above the table</span>
+      </div>
+
+      <div className="form-field">
+        <label>Helper Text</label>
+        <input
+          type="text"
+          {...register("helperText")}
+          onKeyDown={(e) => e.key === "Enter" && e.target.blur()}
+        />
+        <span className="form-description">Help text displayed below the table</span>
+      </div>
+
+      <div className="form-field">
+        <label>Rows</label>
+        <input
+          type="number"
+          {...register("rows", { valueAsNumber: true })}
+          onKeyDown={(e) => e.key === "Enter" && e.target.blur()}
+        />
+        <span className="form-description">Number of rows in the table</span>
+      </div>
+
+      <div className="form-field">
+        <label>Columns</label>
+        <input
+          type="number"
+          {...register("columns", { valueAsNumber: true })}
+          onKeyDown={(e) => e.key === "Enter" && e.target.blur()}
+        />
+        <span className="form-description">Number of columns in the table</span>
+      </div>
+
+      <div className="form-field">
+        <label>Cell Type</label>
+        <select {...register("cellType")}>
+          <option value="text">Text</option>
+          <option value="dropdown">Dropdown</option>
+        </select>
+        <span className="form-description">Select the default cell type for table cells</span>
+      </div>
+
+      {watchCellType === "dropdown" && (
+        <div className="form-field">
+          <label>Dropdown Options</label>
+          <div className="options-list">
+            {localChoices.map((option, index) => (
+              <div key={index} className="option-item">
+                <input
+                  type="text"
+                  value={option}
+                  onChange={(e) => {
+                    const newChoices = [...localChoices];
+                    newChoices[index] = e.target.value;
+                    setLocalChoices(newChoices);
+                  }}
+                  onBlur={handleSubmit(applyChanges)}
+                  placeholder={`Option ${index + 1}`}
+                />
+                <button
+                  type="button"
+                  className="remove-option"
+                  onClick={() => removeChoice(index)}
+                  disabled={localChoices.length === 1}
+                >
+                  &times;
+                </button>
+              </div>
+            ))}
+            <button type="button" onClick={addChoice}>
+              Add Option
+            </button>
+          </div>
+          <span className="form-description">
+            Enter a comma-separated list of options for the dropdown.
+          </span>
+        </div>
+      )}
+
+      <div className="form-field">
+        <label>Toggle Each Cell's Type</label>
+        <table className="cell-type-grid">
+          <tbody>
+            {cellTypeMatrix.map((row, rowIndex) => (
+              <tr key={rowIndex}>
+                {row.map((cell, colIndex) => (
+                  <td key={colIndex}>
+                    <button
+                      type="button"
+                      onClick={() => toggleCellType(rowIndex, colIndex)}
+                    >
+                      {cell}
+                    </button>
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <span className="form-description">
+          Click on a cell to toggle between "text" and "dropdown"
+        </span>
+      </div>
+
+      <div className="switch-field">
+        <label>
+          Required Field
+          <span className="form-description">All cells must be filled if required</span>
+        </label>
+        <input
+          type="checkbox"
+          {...register("required")}
+          onChange={(e) =>
+            handleSubmit(applyChanges)({
+              ...getValues(),
+              required: e.target.checked,
+            })
+          }
+        />
+      </div>
+      <input type="submit" value="Submit" />
+    </form>
+  );
+}

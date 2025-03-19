@@ -1,0 +1,44 @@
+.elements-sidebar {
+    padding: 1rem;
+    background-color: #fff;
+  }
+  
+  .sidebar-description {
+    font-size: 0.875rem;
+    color: #4b5563;
+    margin-bottom: 0.5rem;
+  }
+  
+  .separator {
+    height: 1px;
+    background-color: #e5e7eb;
+    margin: 0.5rem 0;
+  }
+  
+  .elements-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+  
+  @media (min-width: 768px) {
+    .elements-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  
+  .category-heading {
+    font-size: 0.875rem;
+    color: #6b7280;
+    margin: 0.5rem 0;
+    align-self: start;
+  }
+  
+  .layout-elements {
+    grid-column: 1 / -1;
+  }
+  
+  .form-elements {
+    grid-column: 1 / -1;
+    margin-top: 1rem;
+  }
