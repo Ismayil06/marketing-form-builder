@@ -180,67 +180,20 @@ function PropertiesComponent({ elementInstance }) {
   // Initialize localChoices state from the choices string (for dropdown cellType)
   const initialChoices = (elementInstance.extraAttributes.choices || "")
     .split(",")
-    .map((opt) => opt.trim())
-    .filter((opt) => opt !== "");
+    .map(opt => opt.trim())
+    .filter(opt => opt !== "");
   const [localChoices, setLocalChoices] = useState(
     initialChoices.length ? initialChoices : ["New Option"]
   );
-
-  // Initialize cellTypeMatrix: If elementInstance.extraAttributes.cellTypes exists, use it.
-  // Otherwise, fill with the global "cellType" value.
-  const { rows, columns, cellType } = elementInstance.extraAttributes;
-  const [cellTypeMatrix, setCellTypeMatrix] = useState(() => {
-    if (elementInstance.extraAttributes.cellTypes) {
-      return elementInstance.extraAttributes.cellTypes;
-    }
-    return Array.from({ length: rows }, () =>
-      Array.from({ length: columns }, () => cellType)
-    );
-  });
 
   useEffect(() => {
     reset(elementInstance.extraAttributes);
     const updatedChoices = (elementInstance.extraAttributes.choices || "")
       .split(",")
-      .map((opt) => opt.trim())
-      .filter((opt) => opt !== "");
+      .map(opt => opt.trim())
+      .filter(opt => opt !== "");
     setLocalChoices(updatedChoices.length ? updatedChoices : ["New Option"]);
-    // Reset cellTypeMatrix when elementInstance changes.
-    const updatedRows = elementInstance.extraAttributes.rows;
-    const updatedColumns = elementInstance.extraAttributes.columns;
-    setCellTypeMatrix(
-      elementInstance.extraAttributes.cellTypes ||
-        Array.from({ length: updatedRows }, () =>
-          Array.from({ length: updatedColumns }, () => elementInstance.extraAttributes.cellType)
-        )
-    );
   }, [elementInstance, reset]);
-
-  // Watch for changes to rows/columns to update cellTypeMatrix dimensions.
-  const watchRows = watch("rows");
-  const watchColumns = watch("columns");
-  useEffect(() => {
-    setCellTypeMatrix((prevMatrix) => {
-      const newMatrix = [];
-      for (let i = 0; i < watchRows; i++) {
-        newMatrix[i] = [];
-        for (let j = 0; j < watchColumns; j++) {
-          newMatrix[i][j] =
-            prevMatrix[i] && prevMatrix[i][j] ? prevMatrix[i][j] : getValues("cellType");
-        }
-      }
-      return newMatrix;
-    });
-  }, [watchRows, watchColumns, getValues]);
-
-  const toggleCellType = (rowIndex, colIndex) => {
-    setCellTypeMatrix((prevMatrix) => {
-      const newMatrix = prevMatrix.map((row) => [...row]);
-      newMatrix[rowIndex][colIndex] =
-        newMatrix[rowIndex][colIndex] === "text" ? "dropdown" : "text";
-      return newMatrix;
-    });
-  };
 
   const applyChanges = (data) => {
     updateElement(elementInstance.id, {
@@ -248,7 +201,6 @@ function PropertiesComponent({ elementInstance }) {
       extraAttributes: {
         ...data,
         choices: localChoices.join(","),
-        cellTypes: cellTypeMatrix,
       },
     });
   };
@@ -312,7 +264,7 @@ function PropertiesComponent({ elementInstance }) {
           <option value="text">Text</option>
           <option value="dropdown">Dropdown</option>
         </select>
-        <span className="form-description">Select the default cell type for table cells</span>
+        <span className="form-description">Select the cell type for table cells</span>
       </div>
 
       {watchCellType === "dropdown" && (
@@ -351,31 +303,6 @@ function PropertiesComponent({ elementInstance }) {
           </span>
         </div>
       )}
-
-      <div className="form-field">
-        <label>Toggle Each Cell's Type</label>
-        <table className="cell-type-grid">
-          <tbody>
-            {cellTypeMatrix.map((row, rowIndex) => (
-              <tr key={rowIndex}>
-                {row.map((cell, colIndex) => (
-                  <td key={colIndex}>
-                    <button
-                      type="button"
-                      onClick={() => toggleCellType(rowIndex, colIndex)}
-                    >
-                      {cell}
-                    </button>
-                  </td>
-                ))}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-        <span className="form-description">
-          Click on a cell to toggle between "text" and "dropdown"
-        </span>
-      </div>
 
       <div className="switch-field">
         <label>
