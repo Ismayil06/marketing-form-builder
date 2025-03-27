@@ -1,158 +1,191 @@
+/* filepath: /Users/ismayil/Desktop/VS Code/marketing-form-builder/client/src/components/Designer.css */
+/* filepath: /Users/ismayil/Desktop/VS Code/marketing-form-builder/client/src/components/Designer.css */
+
 .designer-container {
-    display: flex;
-    width: 100%;
-    height: 100%;
-  }
-  
-  .designer-main-content {
-    padding: 1rem;
-    width: 100%;
-  }
-  
-  .designer-drop-area {
-    background-color: #fff;
-    max-width: 920px;
-    height: 100%;
-    margin: 0 auto;
-    border-radius: 12px;
-    display: flex;
-    flex-direction: column;
-    flex-grow: 1;
-    align-items: center;
-    justify-content: flex-start;
-    overflow-y: auto;
-  }
-  
-  .drag-over {
-    outline: 4px solid #3b82f6;
-    outline-offset: -4px;
-  }
-  
-  .empty-drop-message {
-    font-size: 1.875rem;
-    color: #6b7280;
-    display: flex;
-    flex-grow: 1;
-    align-items: center;
-    font-weight: bold;
-  }
-  
-  .drop-preview {
-    padding: 1rem;
-    width: 100%;
-  }
-  
-  .drop-preview-indicator {
-    height: 120px;
-    border-radius: 6px;
-    background-color: #bfdbfe;
-  }
-  
-  .elements-container {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    gap: 0.5rem;
-    padding: 1rem;
-  }
-  
-  .element-wrapper {
-    position: relative;
-    height: 120px;
-    display: flex;
-    flex-direction: column;
-    color: #1f2937;
-    cursor: pointer;
-    border-radius: 6px;
-    outline: 1px solid #d1d5db;
-    outline-offset: -1px;
-  }
-  
-  .drop-top-indicator,
-  .drop-bottom-indicator {
-    position: absolute;
-    width: 100%;
-    height: 50%;
-  }
-  
-  .delete-button-container {
-    position: absolute;
-    right: 0;
-    height: 100%;
-  }
-  
-  .delete-button {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100%;
-    width: 40px;
-    background-color: #ef4444;
-    border: none;
-    border-radius: 0 6px 6px 0;
-    cursor: pointer;
-    transition: background-color 0.2s;
-  }
-  
-  .delete-button:hover {
-    background-color: #dc2626;
-  }
-  
-  .trash-icon {
-    height: 24px;
-    width: 24px;
-    color: white;
-  }
-  
-  .drag-hint {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    animation: pulse 1.5s infinite;
-  }
-  
-  .drag-hint p {
-    color: #6b7280;
-    font-size: 0.875rem;
-    margin: 0;
-  }
-  
-  .top-drop-indicator-active {
-    position: absolute;
-    top: 0;
-    width: 100%;
-    height: 7px;
-    background-color: #3b82f6;
-    border-radius: 6px 6px 0 0;
-  }
-  
-  .bottom-drop-indicator-active {
-    position: absolute;
-    bottom: 0;
-    width: 100%;
-    height: 7px;
-    background-color: #3b82f6;
-    border-radius: 0 0 6px 6px;
-  }
-  
-  .element-content {
-    display: flex;
-    width: 100%;
-    height: 120px;
-    align-items: center;
-    border-radius: 6px;
-    background-color: #f3f4f6;
-    padding: 1rem;
-    pointer-events: none;
-    opacity: 1;
-  }
-  
-  .hover-effect {
-    opacity: 0.3;
-  }
-  
-  @keyframes pulse {
-    0%, 100% { opacity: 1 }
-    50% { opacity: 0.5 }
-  }
+  display: flex;
+  height: 100vh;
+  background-color: #f3f4f6;
+  overflow: hidden;
+}
+
+.designer-main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+  overflow-y: auto;
+}
+
+.designer-drop-area {
+  flex: 1;
+  border: 2px dashed transparent;
+  border-radius: 8px;
+  background: #fff;
+  position: relative;
+  padding: 1rem;
+  transition: border 0.3s ease;
+}
+
+.drag-over {
+  outline: 4px solid #3b82f6;
+  outline-offset: -4px;
+}
+
+.empty-drop-message {
+  font-size: 1.875rem;
+  color: #6b7280;
+  display: flex;
+  flex-grow: 1;
+  align-items: center;
+  font-weight: bold;
+}
+
+.drop-preview {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(59, 130, 246, 0.1);
+  border-radius: 8px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.drop-preview-indicator {
+  height: 120px;
+  border-radius: 6px;
+  background-color: #bfdbfe;
+}
+
+.elements-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.element-wrapper {
+  position: relative;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 0.75rem;
+  transition: box-shadow 0.2s ease;
+  cursor: pointer;
+}
+.drop-top-indicator{
+  position: absolute;
+  top: 0;
+  width: 100%;
+  height: 50%;
+}
+.drop-bottom-indicator {
+  position: absolute;
+  width: 100%;
+  height: 50%;
+}
+.element-wrapper:hover {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.delete-button-container {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+}
+
+.delete-button {
+  background: #ef4444;
+  border: none;
+  color: #fff;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  font-size: 0.8rem;
+  cursor: pointer;
+  line-height: 20px;
+  text-align: center;
+  padding: 0;
+}
+
+.drag-hint {
+  position: absolute;
+  bottom: 4px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.75rem;
+  color: #6b7280;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.top-drop-indicator-active {
+  position: absolute;
+  top: 0;
+  width: 100%;
+  height: 7px;
+  background-color: #3b82f6;
+  border-radius: 6px 6px 0 0;
+}
+
+.bottom-drop-indicator-active {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 7px;
+  background-color: #3b82f6;
+  border-radius: 0 0 6px 6px;
+}
+
+.designer-drop-area {
+  flex: 1;
+  border: 2px dashed transparent;
+  border-radius: 8px;
+  background: #fff;
+  position: relative;
+  padding: 1rem;
+  transition: border 0.3s ease;
+}
+
+.designer-drop-area.drag-over {
+  border-color: #3b82f6;
+}
+
+.empty-drop-message {
+  text-align: center;
+  color: #9ca3af;
+  font-size: 1rem;
+  margin-top: 2rem;
+}
+
+.drop-preview {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(59, 130, 246, 0.1);
+  border-radius: 8px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.drop-preview-indicator {
+  width: 50px;
+  height: 4px;
+  background-color: #3b82f6;
+  border-radius: 2px;
+}
+
+
+.hover-effect {
+  opacity: 0.3;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1 }
+  50% { opacity: 0.5 }
+}

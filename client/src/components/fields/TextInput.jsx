@@ -52,7 +52,7 @@ function DesignerComponent({ elementInstance }) {
       <label>
         {label}
         {required && "*"}
-      </label>
+      </label> 
       <input type="text" readOnly disabled placeholder={placeHolder} />
       {helperText && <p className="helper-text">{helperText}</p>}
     </div>

@@ -1,13 +1,13 @@
 .designer-sidebar {
-    width: 400px;
-    max-width: 400px;
-    display: flex;
-    flex-direction: column;
-    flex-grow: 1;
-    gap: 0.5rem;
-    border-left: 2px solid #e5e7eb;
-    padding: 1rem;
-    background-color: #fff;
-    overflow-y: auto;
-    height: 100%;
-  }
+  width: 400px;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  gap: 0.5rem;
+  border-left: 2px solid #e5e7eb;
+  padding: 1rem;
+  background-color: #fff;
+  overflow-y: auto;
+  height: 100%;
+}

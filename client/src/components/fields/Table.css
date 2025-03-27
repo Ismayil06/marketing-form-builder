@@ -1,0 +1,53 @@
+/* filepath: /Users/ismayil/Desktop/VS Code/marketing-form-builder/client/src/components/fields/Table.css */
+
+.table-preview,
+.table-form {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1rem;
+}
+
+/* Borders for table preview in Designer */
+.table-preview th,
+.table-preview td {
+  border: 1px solid #ddd;
+  padding: 0.5rem;
+  text-align: left;
+}
+
+.table-preview th {
+  background-color: #f8f9fa;
+}
+
+/* Borders for form table in FormComponent */
+.table-form th,
+.table-form td {
+  border: 1px solid #ddd;
+  padding: 0.75rem;
+  text-align: left;
+}
+
+.table-form th {
+  background-color: #f0f0f0;
+}
+
+/* Style for table input fields */
+.table-form input[type="text"] {
+  width: 100%;
+  padding: 0.5rem;
+  box-sizing: border-box;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+/* Highlight error on invalid input */
+.error-input {
+  border-color: #dc3545;
+}
+
+/* Form element label styling */
+.form-component label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: bold;
+}

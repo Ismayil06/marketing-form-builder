@@ -62,6 +62,16 @@
   gap: 1rem;
 }
 
+.form-component {
+  display: flex;
+  border-style: solid;
+  border-width: 1px;
+  border-color: #d1d5db;
+  border-radius: 0.375rem;
+  padding: 1rem;
+  flex-direction: column;
+  gap: 1rem;
+}
 .form-row {
   display: flex;
   flex-direction: column;
@@ -94,6 +104,12 @@
   outline: none;
   border-color: #3b82f6;
   box-shadow: 0 0 0 1px #3b82f6;
+}
+
+.designer-component {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 }
 
 .input-description {
