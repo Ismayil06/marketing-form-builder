@@ -1,14 +1,14 @@
-/* filepath: /Users/ismayil/Desktop/VS Code/marketing-form-builder/client/src/components/Designer.css */
-/* filepath: /Users/ismayil/Desktop/VS Code/marketing-form-builder/client/src/components/Designer.css */
+/* filepath: /Users/ismayil/Desktop/VS Code/marketing-form-builder/client/src/components/canvas.css */
+/* filepath: /Users/ismayil/Desktop/VS Code/marketing-form-builder/client/src/components/canvas.css */
 
-.designer-container {
+.canvas-container {
   display: flex;
   height: 100vh;
   background-color: #f3f4f6;
   overflow: hidden;
 }
 
-.designer-main-content {
+.canvas-main-content {
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -16,7 +16,7 @@
   overflow-y: auto;
 }
 
-.designer-drop-area {
+.canvas-drop-area {
   flex: 1;
   border: 2px dashed transparent;
   border-radius: 8px;
@@ -139,7 +139,7 @@
   border-radius: 0 0 6px 6px;
 }
 
-.designer-drop-area {
+.canvas-drop-area {
   flex: 1;
   border: 2px dashed transparent;
   border-radius: 8px;
@@ -149,7 +149,7 @@
   transition: border 0.3s ease;
 }
 
-.designer-drop-area.drag-over {
+.canvas-drop-area.drag-over {
   border-color: #3b82f6;
 }
 

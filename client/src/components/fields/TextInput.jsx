@@ -4,7 +4,7 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
-import useDesigner from "../hooks/useDesigner";
+import useCanvas from "../hooks/useCanvas";
 import { z } from "zod";
 import "./TextInput.css";
 const extraAttributes = {
@@ -28,11 +28,11 @@ export const TextFieldFormElement = {
     type: "TextField",
     extraAttributes,
   }),
-  designerBtnElement: {
+  canvasBtnElement: {
     icon: null,
     label: "Text Field",
   },
-  designerComponent: DesignerComponent,
+  canvasComponent: CanvasComponent,
   formComponent: FormComponent,
   propertiesComponent: PropertiesComponent,
   validate: (formElement, currentValue) => {
@@ -44,11 +44,11 @@ export const TextFieldFormElement = {
   },
 };
 
-function DesignerComponent({ elementInstance }) {
+function CanvasComponent({ elementInstance }) {
   const element = elementInstance;
   const { label, required, placeHolder, helperText } = element.extraAttributes;
   return (
-    <div className="designer-component">
+    <div className="canvas-component">
       <label>
         {label}
         {required && "*"}
@@ -95,7 +95,7 @@ function FormComponent({ elementInstance, submitValue, isInvalid, defaultValue }
 
 function PropertiesComponent({ elementInstance }) {
   const element = elementInstance;
-  const { updateElement } = useDesigner();
+  const { updateElement } = useCanvas();
   const { register, handleSubmit, reset } = useForm({
     resolver: zodResolver(propertiesSchema),
     defaultValues: element.extraAttributes,

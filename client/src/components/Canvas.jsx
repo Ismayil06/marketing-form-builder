@@ -1,19 +1,19 @@
 "use client";
 
 import React, { useState } from "react";
-import DesignerSidebar from "./DesignerSidebar";
+import CanvasSidebar from "./CanvasSidebar";
 import { useDndMonitor, useDraggable, useDroppable } from "@dnd-kit/core";
-import useDesigner from "./hooks/useDesigner";
+import useCanvas from "./hooks/useCanvas";
 import { FormElements } from "./FormElements";
-import "./Designer.css"
+import "./Canvas.css"
 
-export function Designer() {
-  const { elements, addElement, selectedElement, setSelectedElement, removeElement } = useDesigner();
+export function Canvas() {
+  const { elements, addElement, selectedElement, setSelectedElement, removeElement } = useCanvas();
 
   const droppable = useDroppable({
-    id: "designer-drop-area",
+    id: "canvas-drop-area",
     data: {
-      isDesignerDropArea: true,
+      isCanvasDropArea: true,
     },
   });
 
@@ -22,24 +22,24 @@ export function Designer() {
       const { active, over } = event;
       if (!active || !over) return;
 
-      const isDesignerBtnElement = active.data?.current?.isDesignerBtnElement;
-      const isDroppingOverDesignerDropArea = over.data?.current?.isDesignerDropArea;
+      const isCanvasBtnElement = active.data?.current?.isCanvasBtnElement;
+      const isDroppingOverCanvasDropArea = over.data?.current?.isCanvasDropArea;
 
-      const droppingSidebarBtnOverDesignerDropArea = isDesignerBtnElement && isDroppingOverDesignerDropArea;
+      const droppingSidebarBtnOverCanvasDropArea = isCanvasBtnElement && isDroppingOverCanvasDropArea;
 
-      if (droppingSidebarBtnOverDesignerDropArea) {
+      if (droppingSidebarBtnOverCanvasDropArea) {
         const type = active.data?.current?.type;
         const newElement = FormElements[type].construct(Date.now());
         addElement(elements.length, newElement);
         return;
       }
 
-      const isDroppingOverDesignerElementTopHalf = over.data?.current?.isTopHalfDesignerElement;
-      const isDroppingOverDesignerElementBottomHalf = over.data?.current?.isBottomHalfDesignerElement;
-      const isDroppingOverDesignerElement = isDroppingOverDesignerElementTopHalf || isDroppingOverDesignerElementBottomHalf;
-      const droppingSidebarBtnOverDesignerElement = isDesignerBtnElement && isDroppingOverDesignerElement;
+      const isDroppingOverCanvasElementTopHalf = over.data?.current?.isTopHalfCanvasElement;
+      const isDroppingOverCanvasElementBottomHalf = over.data?.current?.isBottomHalfCanvasElement;
+      const isDroppingOverCanvasElement = isDroppingOverCanvasElementTopHalf || isDroppingOverCanvasElementBottomHalf;
+      const droppingSidebarBtnOverCanvasElement = isCanvasBtnElement && isDroppingOverCanvasElement;
 
-      if (droppingSidebarBtnOverDesignerElement) {
+      if (droppingSidebarBtnOverCanvasElement) {
         const type = active.data?.current?.type;
         const newElement = FormElements[type].construct(Date.now());
         const overId = over.data?.current?.elementId;
@@ -48,16 +48,16 @@ export function Designer() {
         if (overElementIndex === -1) throw new Error("element not found");
         
         let indexForNewElement = overElementIndex;
-        if (isDroppingOverDesignerElementBottomHalf) indexForNewElement = overElementIndex + 1;
+        if (isDroppingOverCanvasElementBottomHalf) indexForNewElement = overElementIndex + 1;
         
         addElement(indexForNewElement, newElement);
         return;
       }
 
-      const isDraggingDesignerElement = active.data?.current?.isDesignerElement;
-      const draggingDesignerElementOverAnotherDesignerElement = isDroppingOverDesignerElement && isDraggingDesignerElement;
+      const isDraggingCanvasElement = active.data?.current?.isCanvasElement;
+      const draggingCanvasElementOverAnotherCanvasElement = isDroppingOverCanvasElement && isDraggingCanvasElement;
 
-      if (draggingDesignerElementOverAnotherDesignerElement) {
+      if (draggingCanvasElementOverAnotherCanvasElement) {
         const activeId = active.data?.current?.elementId;
         const overId = over.data?.current?.elementId;
         const activeElementIndex = elements.findIndex((el) => el.id === activeId);
@@ -69,7 +69,7 @@ export function Designer() {
         removeElement(activeId);
 
         let indexForNewElement = overElementIndex;
-        if (isDroppingOverDesignerElementBottomHalf) indexForNewElement = overElementIndex + 1;
+        if (isDroppingOverCanvasElementBottomHalf) indexForNewElement = overElementIndex + 1;
 
         addElement(indexForNewElement, activeElement);
       }
@@ -77,16 +77,16 @@ export function Designer() {
   });
 
   return (
-    <div className="designer-container">
+    <div className="canvas-container">
       <div
-        className="designer-main-content"
+        className="canvas-main-content"
         onClick={() => {
           if (selectedElement) setSelectedElement(null);
         }}
       >
         <div
           ref={droppable.setNodeRef}
-          className={`designer-drop-area ${droppable.isOver ? "drag-over" : ""}`}
+          className={`canvas-drop-area ${droppable.isOver ? "drag-over" : ""}`}
         >
           {!droppable.isOver && elements.length === 0 && (
             <p className="empty-drop-message">Drop here</p>
@@ -100,19 +100,19 @@ export function Designer() {
           {elements.length > 0 && (
             <div className="elements-container">
               {elements.map((element) => (
-                <DesignerElementWrapper key={element.id} element={element} />
+                <CanvasElementWrapper key={element.id} element={element} />
               ))}
             </div>
           )}
         </div>
       </div>
-      <DesignerSidebar />
+      <CanvasSidebar />
     </div>
   );
 }
 
-function DesignerElementWrapper({ element }) {
-  const { removeElement, setSelectedElement } = useDesigner();
+function CanvasElementWrapper({ element }) {
+  const { removeElement, setSelectedElement } = useCanvas();
   const [mouseIsOver, setMouseIsOver] = useState(false);
 
   const topHalf = useDroppable({
@@ -120,7 +120,7 @@ function DesignerElementWrapper({ element }) {
     data: {
       type: element.type,
       elementId: element.id,
-      isTopHalfDesignerElement: true,
+      isTopHalfCanvasElement: true,
     },
   });
 
@@ -129,7 +129,7 @@ function DesignerElementWrapper({ element }) {
     data: {
       type: element.type,
       elementId: element.id,
-      isBottomHalfDesignerElement: true,
+      isBottomHalfCanvasElement: true,
     },
   });
 
@@ -138,13 +138,13 @@ function DesignerElementWrapper({ element }) {
     data: {
       type: element.type,
       elementId: element.id,
-      isDesignerElement: true,
+      isCanvasElement: true,
     },
   });
 
   if (draggable.isDragging) return null;
 
-  const DesignerElement = FormElements[element.type].designerComponent;
+  const CanvasElement = FormElements[element.type].canvasComponent;
   return (
     <div
       ref={draggable.setNodeRef}
@@ -181,7 +181,7 @@ function DesignerElementWrapper({ element }) {
       {bottomHalf.isOver && <div className="bottom-drop-indicator-active" />}
       {topHalf.isOver && <div className="top-drop-indicator-active" />}
       <div className={`element-content ${mouseIsOver ? "hover-effect" : ""}`}>
-        <DesignerElement elementInstance={element} />
+        <CanvasElement elementInstance={element} />
       </div>
       
       
@@ -189,4 +189,4 @@ function DesignerElementWrapper({ element }) {
   );
 }
 
-export default Designer;
+export default Canvas;

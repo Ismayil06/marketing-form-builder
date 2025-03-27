@@ -1,9 +1,9 @@
 import React from "react";
-import useDesigner from "./hooks/useDesigner";
+import useCanvas from "./hooks/useCanvas";
 import { FormElements } from "./FormElements";
 import "./PropertiesFormSidebar.css";
 export function PropertiesFormSidebar() {
-  const { selectedElement, setSelectedElement } = useDesigner();
+  const { selectedElement, setSelectedElement } = useCanvas();
   if (!selectedElement) return null;
 
   const PropertiesForm = FormElements[selectedElement.type].propertiesComponent;

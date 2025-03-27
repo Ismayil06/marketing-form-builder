@@ -4,8 +4,8 @@ import { DragOverlayWrapper } from './components/DragOverlayWrapper';
 import './App.css';
 import { useState } from 'react';
 import { DndContext, MouseSensor, TouchSensor, useSensor, useSensors } from "@dnd-kit/core";
-import Designer from './components/Designer';
-import DesignerContextProvider from './components/context/DesignerContext';
+import Canvas from './components/Canvas';
+import CanvasContextProvider from './components/context/CanvasContext';
 import PreviewDialogBtn from './components/PreviewDialogBtn';
 const App = () => {
 
@@ -29,11 +29,11 @@ const App = () => {
 
   return (
     <DndContext sensors={sensors}>
-      <DesignerContextProvider>
+      <CanvasContextProvider>
         <PreviewDialogBtn></PreviewDialogBtn>
-        <Designer/>
+        <Canvas/>
       <DragOverlayWrapper/>
-      </DesignerContextProvider>
+      </CanvasContextProvider>
       
     </DndContext>
     

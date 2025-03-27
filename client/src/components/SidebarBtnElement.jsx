@@ -3,12 +3,12 @@ import { useDraggable } from "@dnd-kit/core";
 import "./SidebarBtnElement.css"
 function SidebarBtnElement({ formElement }) {
     console.log(formElement);
-  const { label, icon: Icon } = formElement.designerBtnElement;
+  const { label, icon: Icon } = formElement.canvasBtnElement;
   const draggable = useDraggable({
-    id: `designer-btn-${formElement.type}`,
+    id: `canvas-btn-${formElement.type}`,
     data: {
       type: formElement.type,
-      isDesignerBtnElement: true,
+      isCanvasBtnElement: true,
     },
   });
 
@@ -26,7 +26,7 @@ function SidebarBtnElement({ formElement }) {
 }
 
 export function SidebarBtnElementDragOverlay({ formElement }) {
-  const { label, icon: Icon } = formElement.designerBtnElement;
+  const { label, icon: Icon } = formElement.canvasBtnElement;
 
   return (
     <button className="sidebar-btn">

@@ -2,7 +2,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
 import { z } from "zod";
-import useDesigner from "../hooks/useDesigner";
+import useCanvas from "../hooks/useCanvas";
 import "./Dropdown.css";
 
 // filepath: /Users/ismayil/Desktop/VS Code/marketing-form-builder/client/src/components/fields/Dropdown.jsx
@@ -31,11 +31,11 @@ export const DropdownFormElement = {
     type: "Dropdown",
     extraAttributes,
   }),
-  designerBtnElement: {
+  canvasBtnElement: {
     icon: null,
     label: "Dropdown",
   },
-  designerComponent: DesignerComponent,
+  canvasComponent: CanvasComponent,
   formComponent: FormComponent,
   propertiesComponent: PropertiesComponent,
   validate: (formElement, currentValue) => {
@@ -46,13 +46,13 @@ export const DropdownFormElement = {
   },
 };
 
-function DesignerComponent({ elementInstance }) {
+function CanvasComponent({ elementInstance }) {
   const element = elementInstance;
   const { label, required, helperText, options } = element.extraAttributes;
   const optionList = options.split(",").map(opt => opt.trim());
   
   return (
-    <div className="designer-component">
+    <div className="canvas-component">
       <label>
         {label}
         {required && "*"}
@@ -113,7 +113,7 @@ function FormComponent({ elementInstance, submitValue, isInvalid, defaultValue }
 function PropertiesComponent({ elementInstance }) {
   const element = elementInstance;
   const { label, helperText, options } = element.extraAttributes;
-  const { updateElement } = useDesigner();
+  const { updateElement } = useCanvas();
   const { register, handleSubmit, reset, getValues } = useForm({
     resolver: zodResolver(propertiesSchema),
     defaultValues: { ...element.extraAttributes, options },

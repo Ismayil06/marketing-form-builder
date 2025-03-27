@@ -1,9 +1,9 @@
 import React, { useState } from "react";
-import useDesigner from "./hooks/useDesigner";
+import useCanvas from "./hooks/useCanvas";
 import { FormElements } from "./FormElements";
 import "./PreviewDialogBtn.css"
 function PreviewDialogBtn() {
-  const { elements } = useDesigner();
+  const { elements } = useCanvas();
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
 
   return (

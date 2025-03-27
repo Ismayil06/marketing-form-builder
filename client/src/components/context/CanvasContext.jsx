@@ -2,9 +2,9 @@
 
 import { createContext, useState } from "react";
 
-export const DesignerContext = createContext(null);
+export const CanvasContext = createContext(null);
 
-export default function DesignerContextProvider({ children }) {
+export default function CanvasContextProvider({ children }) {
   const [elements, setElements] = useState([]);
   const [selectedElement, setSelectedElement] = useState(null);
 
@@ -30,7 +30,7 @@ export default function DesignerContextProvider({ children }) {
   };
 
   return (
-    <DesignerContext.Provider
+    <CanvasContext.Provider
       value={{
         elements,
         setElements,
@@ -42,6 +42,6 @@ export default function DesignerContextProvider({ children }) {
       }}
     >
       {children}
-    </DesignerContext.Provider>
+    </CanvasContext.Provider>
   );
 }

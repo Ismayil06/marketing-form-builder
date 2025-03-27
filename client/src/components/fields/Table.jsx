@@ -2,7 +2,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
 import { z } from "zod";
-import useDesigner from "../hooks/useDesigner";
+import useCanvas from "../hooks/useCanvas";
 import "./Table.css";
 
 // filepath: /Users/ismayil/Desktop/VS Code/marketing-form-builder/client/src/components/fields/Table.jsx
@@ -36,11 +36,11 @@ export const TableFormElement = {
     type: "Table",
     extraAttributes,
   }),
-  designerBtnElement: {
+  canvasBtnElement: {
     icon: null,
     label: "Table",
   },
-  designerComponent: DesignerComponent,
+  canvasComponent: CanvasComponent,
   formComponent: FormComponent,
   propertiesComponent: PropertiesComponent,
   validate: (formElement, currentValue) => {
@@ -56,7 +56,7 @@ export const TableFormElement = {
   },
 };
 
-function DesignerComponent({ elementInstance }) {
+function CanvasComponent({ elementInstance }) {
   const { label, helperText, required, columns, rows, cellType, cellOptions } = elementInstance.extraAttributes;
   const cols = columns.split(",").map((col) => col.trim());
   const rowLabels = rows.split(",").map((row) => row.trim());
@@ -64,7 +64,7 @@ function DesignerComponent({ elementInstance }) {
   const options = cellOptions ? cellOptions.split(",").map(opt => opt.trim()) : [];
   
   return (
-    <div className="designer-component">
+    <div className="canvas-component">
       <label>
         {label} {required && "*"}
       </label>
@@ -201,7 +201,7 @@ function FormComponent({ elementInstance, submitValue, isInvalid, defaultValue }
 }
 
 function PropertiesComponent({ elementInstance }) {
-  const { updateElement } = useDesigner();
+  const { updateElement } = useCanvas();
   const { register, handleSubmit, reset, watch } = useForm({
     resolver: zodResolver(propertiesSchema),
     defaultValues: elementInstance.extraAttributes,

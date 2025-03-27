@@ -1,16 +1,16 @@
 import React from "react";
-import useDesigner from "./hooks/useDesigner";
+import useCanvas from "./hooks/useCanvas";
 import FormElementsSidebar from "./FormElementsSidebar";
 import PropertiesFormSidebar from "./PropertiesFormSidebar";
-import "./DesignerSidebar.css";
-function DesignerSidebar() {
-  const { selectedElement } = useDesigner();
+import "./CanvasSidebar.css";
+function CanvasSidebar() {
+  const { selectedElement } = useCanvas();
   return (
-    <aside className="designer-sidebar">
+    <aside className="canvas-sidebar">
       {!selectedElement && <FormElementsSidebar />}
       {selectedElement && <PropertiesFormSidebar />}
     </aside>
   );
 }
 
-export default DesignerSidebar;
+export default CanvasSidebar;
